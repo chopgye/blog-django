@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils import timezone 
 from django.contrib.auth.models import User  #relation between post and user created in django ORM
-
+from django.urls import reverse 
 # models are essentionaly objects and we interact with databse using django buil-in ORM
 # each class is a table in the database
 class Post(models.Model):
@@ -12,3 +12,6 @@ class Post(models.Model):
 
     def __str__(self):      #special methods, can be called to display said attributes of a given row
         return self.title
+    
+    def get_absolute_url(self):
+        return reverse('post-detail', kwargs={'pk': self.pk})

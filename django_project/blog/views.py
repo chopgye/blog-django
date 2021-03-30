@@ -1,6 +1,6 @@
 from django.http import request
 from django.shortcuts import render, get_object_or_404
-from django.contrib.auth.models import User
+#from django.contrib.auth.models import User
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.views.generic import (
     ListView, 
@@ -10,6 +10,10 @@ from django.views.generic import (
     DeleteView
 )
 from .models import Post     #the . means modles is located in the sanme directory
+
+from users.models import Account as User
+from .models import Comment
+from .forms import NewCommentForm
 
 # provides inbound HTTP request to django server
 def home(request):
@@ -37,6 +41,24 @@ class UserPostListView(ListView):
 
 class PostDetailView(DetailView):
     model = Post        #if the naming conevention are maintained this will suffice
+
+    def get_context_data(self, **kwargs):   #override this method, to pass more context than the original implemenation
+        context = super().get_context_data(**kwargs)   #call base implementaion to get the base context
+
+        comments_connected = Comment.objects.filter(parent_post=self.get_object()).order_by('-date_posted')
+        context['comments'] = comments_connected
+        
+        if self.request.user.is_authenticated:
+            context['comment_form'] = NewCommentForm(instance = self.request.user)
+        return context
+
+    #need a post method to retrive the context back from our forms and to the detailview
+    def post(self, request, *args, **kwargs):
+        new_comment = Comment(content=request.POST.get('content'),
+                                  author=self.request.user,
+                                  parent_post=self.get_object())
+        new_comment.save()
+        return self.get(self, request, *args, **kwargs)
 
 class PostCreateView(LoginRequiredMixin, CreateView):
     model = Post

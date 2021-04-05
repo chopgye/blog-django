@@ -8,6 +8,8 @@ django = "*"
 psycopg2-binary = "*"
 django-crispy-forms = "*"
 pillow = "*"
+boto3 = "*"
+django-storages = "*"
 
 [dev-packages]
 

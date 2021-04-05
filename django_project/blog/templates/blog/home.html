@@ -10,7 +10,8 @@
                 </div>
                 <h2><a class="article-title" href="{% url 'post-detail' post.id %}">{{ post.title }}</a></h2>
                 <p class="article-content">{{ post.content }}</p>
-            </div>  
+                <p><a href="{% url 'post-detail' post.id %}"> {{ post.number_of_comments }} Comment{{ post.number_of_comments|pluralize }} </a></p>  
+            </div>
         </article>
     {% endfor %}
     {% if is_paginated %} 

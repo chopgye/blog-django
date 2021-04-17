@@ -67,20 +67,20 @@ a.article-title:hover {
 }
 
 .article-svg {
-width: 25px;
-height: 25px;
-vertical-align: middle;
+    width: 25px;
+    height: 25px;
+    vertical-align: middle;
 }
 
 .account-img {
-height: 125px;
-width: 125px;
-margin-right: 20px;
-margin-bottom: 16px;
+    height: 125px;
+    width: 125px;
+    margin-right: 20px;
+    margin-bottom: 16px;
 }
 
 .account-heading {
-font-size: 2.5rem;
+    font-size: 2.5rem;
 }
 
 .comment-wrapper .panel-body {
@@ -97,4 +97,7 @@ font-size: 2.5rem;
 .comment-wrapper .media-list .media {
     border-bottom:1px dashed #efefef;
     margin-bottom:25px;
+}
+.thumb-active {
+    fill: blue
 }

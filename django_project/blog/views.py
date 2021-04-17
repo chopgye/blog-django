@@ -1,4 +1,7 @@
-from django.http import request
+from django.contrib.contenttypes.models import ContentType
+from django.db.models import query
+from django.http import request, response
+from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404
 #from django.contrib.auth.models import User
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
@@ -9,11 +12,16 @@ from django.views.generic import (
     UpdateView,
     DeleteView
 )
-from .models import Post     #the . means modles is located in the sanme directory
+from django.views.generic.base import RedirectView
+from .models import Post, VoteModel     #the . means modles is located in the sanme directory
 
 from users.models import Account as User
-from .models import Comment
-from .forms import NewCommentForm
+from .models import Comment, Vote
+from .forms import NewCommentForm, VoteForm
+from django.http import HttpResponse
+import json
+from django.core import serializers
+
 
 # provides inbound HTTP request to django server
 def home(request):
@@ -28,6 +36,135 @@ class PostListView(ListView):
     context_object_name = 'posts'   #otherwise object.list is iterated in the template
     ordering = ['-date_posted'] #newest to oldest in the object query
     paginate_by = 5
+
+
+#    def get_context_data(self, **kwargs):   #override this method, to pass more context than the original implemenation
+#        context = super().get_context_data(**kwargs)   #call base implementaion to get the base 
+        
+#        if self.request.user.is_authenticated:
+#            context['vote_form'] = VoteForm(instance = self.request.user)
+#        return context
+
+
+
+ #   def post(self, request, *args, **kwargs):
+        
+#      post = get_object_or_404(Post, id=request.POST.get('post_id'))
+
+
+ #       post1 = get_object_or_404(Post, id=request.POST.get('post_upvoted'))
+ #       post2 = get_object_or_404(Post, id=request.POST.get('post_downvoted'))
+        
+#        new_vote = Vote(vote_choice=request.POST.get('vote_choice'),
+#                                  author=self.request.user,
+#                                  content_object=post)
+#        new_vote.save()
+
+ #       if response.POST.get("post_upvoted"):
+ #           new_vote = Vote(vote_choice='U',
+ #                                 author=self.request.user,
+ #                                 content_object=post1)
+ #           new_vote.save()
+
+ #       elif response.POST.get("post_downvoted"):
+ #           pass
+
+#      return self.get(self, request, *args, **kwargs)
+
+class PostLikeToggle(RedirectView):
+    model = Post
+    template_name = 'blog/home.html'  #<app>/<model>_<viewtype>.html
+    context_object_name = 'posts'   #otherwise object.list is iterated in the template
+
+
+    def post(self, request, *args, **kwargs):
+        if self.request.POST.get("content_type","") == 'post':  #refer to property decorator in models 
+            model_type = get_object_or_404(Post, id=self.request.POST.get("id", ""))
+        elif self.request.POST.get("content_type","") == 'comment':
+            model_type = get_object_or_404(Comment, id=self.request.POST.get("id", ""))
+
+        vote_choice = self.request.POST.get("vote_type", "")
+
+        flag = False           # if vote exist (false = doesn't exist)
+
+        #clear favroites by the current user on the current post, if flag is true don't creat new favorite
+        # favroite logic seperated from vote logic to avoid collision where vote instance exist but type of vote = F leading to 404
+        if Vote.objects.filter(author = self.request.user, object_id = model_type.id, type_of_vote = 'F'):
+           
+            if vote_choice == 'post_favorited':
+                curr_vote = get_object_or_404(Vote, type_of_vote = 'F', object_id = model_type.id, author = self.request.user)
+                curr_vote.delete()
+                flag = True
+        
+        #needs to catch both 'U' and 'D' conditions          
+        if (Vote.objects.filter(object_id = model_type.id, author = self.request.user, type_of_vote = 'U')) or (Vote.objects.filter(object_id = model_type.id, author = self.request.user, type_of_vote = 'D')):
+            print(self.request.user.id)
+
+           # flag means that same type of vote currently exists and is therefore deleted, no new additions 
+           # print(f'current vote: {curr_vote}')
+            if vote_choice == 'post_upvoted':
+                
+                #we know an upvote or downvote exist, try one at a time, one of them will succeed and the other will throw 404
+                #needs to exist after post_voted, because otherwise 
+                try:    
+                    curr_vote = get_object_or_404(Vote, type_of_vote = 'U', author = self.request.user, object_id = model_type.id )
+                except:
+                    curr_vote = get_object_or_404(Vote, type_of_vote = 'D', author = self.request.user, object_id = model_type.id )
+
+                if curr_vote.type_of_vote == 'U':
+                    curr_vote.delete()
+                    flag = True
+                else:
+                    curr_vote.delete()               #deletes polar votes i.e if post is upvoted but a downvote exists 
+ 
+            if vote_choice == 'post_downvoted':
+                try:    
+                    curr_vote = get_object_or_404(Vote, type_of_vote = 'U', author = self.request.user, object_id = model_type.id )
+                except:
+                    curr_vote = get_object_or_404(Vote, type_of_vote = 'D', author = self.request.user, object_id = model_type.id )
+                if curr_vote.type_of_vote == 'D':
+                    curr_vote.delete()
+                    flag = True
+                else:
+                    curr_vote.delete()
+
+        #flag = false: means no existing upvotes in database, therefore create a new one
+        if vote_choice == 'post_upvoted' and flag == False:             
+            new_vote = Vote(type_of_vote='U',
+                                author=self.request.user,
+                                content_object=model_type)
+            new_vote.save()
+            model_type.save()
+
+
+        #flag = false: means there is no existing downvotes in the database 
+        # delete any potentional upvotes and a new downvote
+        if vote_choice == 'post_downvoted' and flag == False:
+            new_vote = Vote(type_of_vote='D',
+                                author=self.request.user,
+                                content_object=model_type)
+            new_vote.save()
+            model_type.save()
+
+        #flag = false: means there is no existing downvotes in the database 
+        # delete any potentional upvotes and a new downvote
+        if vote_choice == 'post_favorited' and flag == False:
+            new_vote = Vote(type_of_vote='F',
+                                author=self.request.user,
+                                content_object=model_type)
+            new_vote.save()
+            model_type.save()
+
+        if request.method == 'POST' and request.is_ajax():
+                json_dict = {
+                    'vote_count': model_type.number_of_votes,
+                    'post_upvotes': model_type.num_upvotes,    
+                    'post_downvotes':model_type.num_downvotes,
+                    'post_favorites':model_type.num_favorites
+                }
+                return JsonResponse(json_dict, safe=False)
+    
+        return JsonResponse({"Error": ""}, status=400)
 
 class UserPostListView(ListView):
     model = Post

@@ -85,7 +85,7 @@ WSGI_APPLICATION = 'django_project.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
-DB_NAME = "blog"
+DB_NAME = "blog_v2"
 
 DATABASES = {
     'default': {
@@ -94,7 +94,7 @@ DATABASES = {
         'USER': os.environ.get('DB_USER'), 
         'PASSWORD': os.environ.get('DB_PASSWORD'),
         'HOST': '127.0.0.1', 
-        'PORT': '5432',
+        'PORT': '5433',
     }
 }
 

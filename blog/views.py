@@ -37,7 +37,7 @@ class PostListView(ListView):
     ordering = ['-date_posted'] #newest to oldest in the object query
     paginate_by = 5
 
-
+# (Without ajax call, pure django) 
 #    def get_context_data(self, **kwargs):   #override this method, to pass more context than the original implemenation
 #        context = super().get_context_data(**kwargs)   #call base implementaion to get the base 
         

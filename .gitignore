@@ -23,4 +23,4 @@ media
 .env
 
 ### docker volume ###
-data
+/data

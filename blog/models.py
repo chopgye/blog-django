@@ -32,10 +32,6 @@ class Vote(models.Model):
 
 class VoteModel(models.Model):
     votes = GenericRelation(Vote)
-#    vote_score = models.IntegerField(default=0)
-#    num_upvotes = models.IntegerField(default=0)
-#    num_downvotes = models.IntegerField(default=0)
-#    num_favorites = models.IntegerField(default=0) 
     class meta:
         abstract = True
     
@@ -93,11 +89,6 @@ class Post(VoteModel):
     def number_of_comments(self):
         return Comment.objects.filter(parent_post=self).count()
     
-#    @property
-#    def number_of_votes(self):
-#        self.votes.all()
-#        return self.votes.filter(type_of_vote='U').count()
-
 class Comment(VoteModel):
     parent_post = models.ForeignKey(Post, related_name="comments", on_delete=models.CASCADE)
     author = models.ForeignKey(User, on_delete=CASCADE)

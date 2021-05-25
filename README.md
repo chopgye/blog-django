@@ -28,8 +28,9 @@ $ docker-compose exec web python manage.py migrate
 * Add comments
   * delete
 * Upvote / downvote / unvote [post and comments]
-* Favorite 
-* Sort post by users
+* Favorite
+* Sort posts by time posted  
+* Sort posts by specific users
 * Pagination
   
 ## Database 

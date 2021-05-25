@@ -48,6 +48,7 @@ $ docker-compose exec web python manage.py migrate
 * Gunicorn
 * Pillow
 * Docker
+* Pipenv
   
 ## Design Choices
 ### __Class based views vs function based views__ 

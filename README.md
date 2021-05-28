@@ -1,7 +1,7 @@
 # Django Blog
 
 ## General Info
-This project is my attempt at learning and applying the Django framework and all the other supplementary technologies involved in the process. I wanted to do a project that's simple in concept, therefore I have more freedom to focus all my efforts and complexity on the implementation side. This blog app utilizies MVC framework and handles all the renderings on the server side (SSR). This project is almost purely ran on vanilla Django, with some javascript exceptions such as AJAX calls. 
+ I wanted to do a project that's simple in concept, therefore I have more freedom to focus all my efforts and complexity on the implementation side. This blog app utilizies MVC framework and handles all the renderings on the server side (SSR). This project is almost purely ran on vanilla Django, with some javascript exceptions such as AJAX calls. 
 
 ## Installation
 Method 1:

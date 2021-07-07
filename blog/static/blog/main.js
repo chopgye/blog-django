@@ -24,19 +24,48 @@ $(document).ready(function () {
             },
             success: function(data){
 
-            console.log(data)
+            console.log(data);
+            console.log(data.is_upvoted);
+            console.log(data.is_downvoted);
             console.log("post upvotes: " + data['post_upvotes'])
             console.log("post downvotes: " + data['post_downvotes'])
             console.log("total vote count: " + data['vote_count'])
             console.log("post favorites: " + data['post_favorites'])
+            console.log("is Upvoted: " + data['is_upvoted'])
+            console.log("is Downvoted: " + data['is_downvoted'])
+            console.log("is_favorited: " + data['is_favorited'])
+
 
 
                 $(".vote_count"+ id).html(data.vote_count + " Votes"); 
                 $(".up"+ id).html(data['post_upvotes'])    
                 $(".down"+  id).html(data['post_downvotes'])    
-                $(".favorite"+ id).html(data['post_favorites'])    
+                $(".favorite"+ id).html(data['post_favorites']) 
                 
-                console.log("post id after :" + id)
+        
+
+                    if (data['is_upvoted'] == true) { 
+                        $(".upcolor" + id).css('fill', 'orangered');
+                    } else {
+                        $(".upcolor" + id).css('fill', 'gray');
+                    }
+
+                    if (data['is_downvoted'] == true) { 
+                        $(".downcolor"+ id).css('fill', 'blue');
+                    } else {
+                        $(".downcolor"+ id).css('fill', 'gray');
+                    }
+
+                    if (data['is_favorited'] == true) { 
+                        $(".favcolor"+ id).css('fill', 'gold');
+                    } else {
+                        $(".favcolor"+ id).css('fill', 'black');
+                    }
+                    
+        
+
+                
+                console.log("post id after :" + id);
                 
             }
         });

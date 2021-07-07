@@ -1,33 +1,64 @@
 {% extends "blog/base.html" %}
 {% load crispy_forms_tags %}
-{% block content %}         
+{% block content %}
+<div class = "graybox" >
     <article class="media content-section">
-        <img class ="rounded-circle article-img" src="{{ post.author.profile.image.url }}">
+        <div class = "box">
+            <img class ="rounded-circle article-img" src="{{ post.author.profile.image.url }}">
+            <span class="text-right">
+                {% if user.is_authenticated %}
+                    {% csrf_token %}
+                    <small class ="up{{ post.id }}">{{ post.num_upvotes }}</small>
+
+                    <a class ="vote", data-id="{{ post.pk }}" type="submit", data-content_type="{{ post.content_type }}", data-url='{{ post.get_vote_url }}', data-vote="post_upvoted">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="upcolor{{ post.id }} bi bi-caret-up" viewBox="0 0 16 16">
+                            <path d="M3.204 11h9.592L8 5.519 3.204 11zm-.753-.659 4.796-5.48a1 1 0 0 1 1.506 0l4.796 5.48c.566.647.106 1.659-.753 1.659H3.204a1 1 0 0 1-.753-1.659z"/>
+                        </svg>
+                    </a>
+                    
+                    <a class="avg-vote text-muted vote_count{{ post.id }}" href="{% url 'post-detail' post.id %}"> {{ post.number_of_votes }} Vote{{ post.number_of_votes|pluralize }} </a>                         
+                    
+                    <a class ="vote ", data-id="{{ post.pk }}" type="submit", data-content_type="{{ post.content_type }}", data-url='{{ post.get_vote_url }}', data-vote="post_downvoted">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class=" downcolor{{ post.id }} bi bi-caret-down" viewBox="0 0 16 16">
+                            <path d="M3.204 5h9.592L8 10.481 3.204 5zm-.753.659 4.796 5.48a1 1 0 0 0 1.506 0l4.796-5.48c.566-.647.106-1.659-.753-1.659H3.204a1 1 0 0 0-.753 1.659z"/>
+                        </svg>
+                    </a>
+                    <small class="down{{ post.id }}">{{ post.num_downvotes }}</small> 
+                </span>
+
+        </div>
         <div class="media-body">
             <div class="article-metadata">
-                <a class="mr-2" href="{% url 'user-posts' object.author.username %}">{{ object.author }}</a>
-                <small class="text-muted">{{ object.date_posted|date:"F d, Y" }}</small>
-                <span class="text-right">
-                    {% if user.is_authenticated %}
-                        {% csrf_token %}
-                        <small class ="up{{ post.id }}">{{ post.num_upvotes }}</small>
-                        <button class="vote btn btn-primary btn-sm", data-id="{{ post.pk }}" type="submit", data-content_type="{{ post.content_type }}", data-url='{{ post.get_vote_url }}', data-vote="post_upvoted">Upvote</button>
-                        <small class="down{{ post.id }}">{{ post.num_downvotes }}</small>
-                        <button class="vote btn btn-primary btn-sm", data-id="{{ post.pk }}" type="submit", data-content_type="{{ post.content_type }}", data-url='{{ post.get_vote_url }}', data-vote="post_downvoted" >Downvote</button>
-                    </span>
+
+                <a class="mr-2" href="{% url 'user-posts' post.author.username %}">{{ post.author }}</a>
+                <small class="text-muted">{{ post.date_posted|date:"F d, Y" }}</small>
+
+             
+            <a class ="vote star", data-id="{{ post.pk }}" type="submit", data-content_type="{{ post.content_type }}", data-url='{{ post.get_vote_url }}', data-vote="post_favorited">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class=" favcolor{{ post.id }} bi bi-star" viewBox="0 0 16 16">
+                    <path d="M2.866 14.85c-.078.444.36.791.746.593l4.39-2.256 4.389 2.256c.386.198.824-.149.746-.592l-.83-4.73 3.522-3.356c.33-.314.16-.888-.282-.95l-4.898-.696L8.465.792a.513.513 0 0 0-.927 0L5.354 5.12l-4.898.696c-.441.062-.612.636-.283.95l3.523 3.356-.83 4.73zm4.905-2.767-3.686 1.894.694-3.957a.565.565 0 0 0-.163-.505L1.71 6.745l4.052-.576a.525.525 0 0 0 .393-.288L8 2.223l1.847 3.658a.525.525 0 0 0 .393.288l4.052.575-2.906 2.77a.565.565 0 0 0-.163.506l.694 3.957-3.686-1.894a.503.503 0 0 0-.461 0z"/>
+                </svg>
+            </a>
+            <small class="favorite{{ post.id }}">{{ post.num_favorites }}</small>   
+            <h2><a class="article-title" href="{% url 'post-detail' post.id %}">{{ post.title }}</a></h2>
+            <p class="article-content">{{ post.content }}</p>
+            <div class="article-metadata">
+                <a class="text-secondary" href="{% url 'post-detail' post.id %}"> {{ post.number_of_comments }} Comment{{ post.number_of_comments|pluralize }} </a> 
+                {% if object.author == user %}
+                <div>
+                    <a class="btn btn-secondary btn-sm mt-1 mb-1" href="{% url 'post-update' object.id %}">Update</a>
+                    <a class="btn btn-danger btn-sm mt-1 mb-1" href="{% url 'post-delete' object.id %}">Delete</a>
+                </div>
+        {% endif %}
+            </div>        
                     {% else %}
-                    <a class="btn btn-outline-info" href="{% url 'login' %}?next={{request.path}}">Log in to vote!</a><br>
-                    {% endif %}   
-            </div>
-            <h2 class="article-title">{{ object.title }}</h2>
-            <p class="article-content">{{ object.content }}</p>
-            {% if object.author == user %}
-                    <div>
-                        <a class="btn btn-secondary btn-sm mt-1 mb-1" href="{% url 'post-update' object.id %}">Update</a>
-                        <a class="btn btn-danger btn-sm mt-1 mb-1" href="{% url 'post-delete' object.id %}">Delete</a>
-                    </div>
-            {% endif %}
-        </div>  
+                 
+                    <h2><a class="article-title" href="{% url 'post-detail' post.id %}">{{ post.title }}</a></h2>
+                    <p class="article-content-blur">{{ post.content }}</p>
+                    
+                    <a class="btn btn-outline-info" href="{% url 'login' %}?next={{request.path}}">Log in to view!</a><br>
+                    {% endif %}     
+        </div>
     </article>
     <!-- COMMENTS  -->
     <h2>Leave your comment!</h2>
@@ -51,22 +82,33 @@
             <article class="media content-section">
                 <img class ="rounded-circle article-img" src="{{ comment.author.profile.image.url }}">           
                 <div class="media-body">
-                    <div class="article-metadata"> 
+                    <div class="article-metadata comment-meta"> 
                         <a class="mr-2" href="{% url 'user-posts' comment.author.username %}"> <strong>{{ comment.author }}</strong></a>              
                         <small class="text-muted">{{ comment.date_posted|date:"F d, Y" }}</small>   
-                        <span class="text-right">
+                       
                             {% if user.is_authenticated %}
                                 {% csrf_token %}
                                 <small class ="up{{ comment.id }}">{{ comment.num_upvotes }}</small>
-                                <button class="vote btn btn-primary btn-sm", data-id="{{ comment.pk }}" type="submit", data-content_type="{{ comment.content_type }}", data-url='{{ post.get_vote_url }}', data-vote="post_upvoted">Upvote</button>
-                                <small class="down{{ comment.id }}">{{ comment.num_downvotes }}</small>
-                                <button class="vote btn btn-primary btn-sm", data-id="{{ comment.pk }}" type="submit", data-content_type="{{ comment.content_type }}", data-url='{{ post.get_vote_url }}', data-vote="post_downvoted" >Downvote</button>
-                            </span>
+
+                                <a class ="vote", data-id="{{ comment.pk }}" type="submit", data-content_type="{{ comment.content_type }}", data-url='{{ post.get_vote_url }}', data-vote="post_upvoted">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="upcolor{{ comment.id }} bi bi-caret-up" viewBox="0 0 16 16">
+                                        <path d="M3.204 11h9.592L8 5.519 3.204 11zm-.753-.659 4.796-5.48a1 1 0 0 1 1.506 0l4.796 5.48c.566.647.106 1.659-.753 1.659H3.204a1 1 0 0 1-.753-1.659z"/>
+                                    </svg>
+                                </a>
+
+                                <small class ="down{{ comment.id }}">{{ comment.num_downvotes }}</small>
+
+                                <a class ="vote", data-id="{{ comment.pk }}" type="submit", data-content_type="{{ comment.content_type }}", data-url='{{ post.get_vote_url }}', data-vote="post_downvoted">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="downcolor{{ comment.id }} bi bi-caret-up" viewBox="0 0 16 16">
+                                        <path d="M3.204 11h9.592L8 5.519 3.204 11zm-.753-.659 4.796-5.48a1 1 0 0 1 1.506 0l4.796 5.48c.566.647.106 1.659-.753 1.659H3.204a1 1 0 0 1-.753-1.659z"/>
+                                    </svg>
+                                </a>
+                            
                             {% else %}
                             <a class="btn btn-outline-info" href="{% url 'login' %}?next={{request.path}}">Log in to vote!</a><br>
                             {% endif %} 
                     </div>    
-                    <p>{{ comment.content|safe }}</p>            
+                    <p class = comment-content>{{ comment.content|safe }}</p>            
                 </div>
             </article>
             {% endfor %}
@@ -85,3 +127,5 @@
         </div>
         <h2><a class="article-title" href="{% url 'post-detail' post.id %}">{{ post.title }}</a></h2>
         <p class="article-content">{{ post.content }}</p>
+    </div>
+</div>

@@ -26,7 +26,7 @@ from django.core import serializers
 # provides inbound HTTP request to django server
 def home(request):
     context = {
-        'posts': Post.objects.all()   #retrives all the records in Post table from database
+        'posts': Post.objects.all(),   #retrives all the records in Post table from database
     }
     return render(request, 'blog/home.html', context)
 
@@ -35,7 +35,7 @@ class PostListView(ListView):
     template_name = 'blog/home.html'  #<app>/<model>_<viewtype>.html
     context_object_name = 'posts'   #otherwise object.list is iterated in the template
     ordering = ['-date_posted'] #newest to oldest in the object query
-    paginate_by = 5
+    # paginate_by = 5
 
 # (Without ajax call, pure django) 
 #    def get_context_data(self, **kwargs):   #override this method, to pass more context than the original implemenation
@@ -155,12 +155,30 @@ class PostLikeToggle(RedirectView):
             new_vote.save()
             model_type.save()
 
+        if Vote.objects.filter(author = self.request.user, object_id = model_type.id, type_of_vote = 'U'):
+            isUpvoted = True
+        else:
+            isUpvoted = False 
+
+        if Vote.objects.filter(author = self.request.user, object_id = model_type.id, type_of_vote = 'D'):
+            isDownvoted = True
+        else:
+            isDownvoted = False
+    
+        if Vote.objects.filter(author = self.request.user, object_id = model_type.id, type_of_vote = 'F'):
+            isFavorited = True
+        else:
+            isFavorited = False
+        
         if request.method == 'POST' and request.is_ajax():
                 json_dict = {
                     'vote_count': model_type.number_of_votes,
                     'post_upvotes': model_type.num_upvotes,    
                     'post_downvotes':model_type.num_downvotes,
-                    'post_favorites':model_type.num_favorites
+                    'post_favorites':model_type.num_favorites,
+                    'is_upvoted': isUpvoted,
+                    'is_downvoted': isDownvoted,
+                    'is_favorited': isFavorited,
                 }
                 return JsonResponse(json_dict, safe=False)
     

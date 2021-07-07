@@ -22,5 +22,8 @@ media
 ### environmental varibles ### 
 .env
 
+### dummy data
+posts.json
+
 ### docker volume ###
 /data

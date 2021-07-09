@@ -8,22 +8,32 @@
             <span class="text-right">
                 {% if user.is_authenticated %}
                     {% csrf_token %}
-                    <small class ="up{{ post.id }}">{{ post.num_upvotes }}</small>
-
-                    <a class ="vote", data-id="{{ post.pk }}" type="submit", data-content_type="{{ post.content_type }}", data-url='{{ post.get_vote_url }}', data-vote="post_upvoted">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="upcolor{{ post.id }} bi bi-caret-up" viewBox="0 0 16 16">
-                            <path d="M3.204 11h9.592L8 5.519 3.204 11zm-.753-.659 4.796-5.48a1 1 0 0 1 1.506 0l4.796 5.48c.566.647.106 1.659-.753 1.659H3.204a1 1 0 0 1-.753-1.659z"/>
-                        </svg>
-                    </a>
-                    
-                    <a class="avg-vote text-muted vote_count{{ post.id }}" href="{% url 'post-detail' post.id %}"> {{ post.number_of_votes }} Vote{{ post.number_of_votes|pluralize }} </a>                         
-                    
-                    <a class ="vote ", data-id="{{ post.pk }}" type="submit", data-content_type="{{ post.content_type }}", data-url='{{ post.get_vote_url }}', data-vote="post_downvoted">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class=" downcolor{{ post.id }} bi bi-caret-down" viewBox="0 0 16 16">
-                            <path d="M3.204 5h9.592L8 10.481 3.204 5zm-.753.659 4.796 5.48a1 1 0 0 0 1.506 0l4.796-5.48c.566-.647.106-1.659-.753-1.659H3.204a1 1 0 0 0-.753 1.659z"/>
-                        </svg>
-                    </a>
-                    <small class="down{{ post.id }}">{{ post.num_downvotes }}</small> 
+                    <small class ="up{{ post.id }}">{{ post.num_upvotes }}</small>  
+                        <a class ="vote", data-id="{{ post.pk }}" type="submit", data-content_type="{{ post.content_type }}", data-url='{{ post.get_vote_url }}', data-vote="post_upvoted">
+                            {% if post.is_upvoted %}
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="orange" class="upcolor{{ post.id }} bi bi-caret-up" viewBox="0 0 16 16">
+                                <path d="M3.204 11h9.592L8 5.519 3.204 11zm-.753-.659 4.796-5.48a1 1 0 0 1 1.506 0l4.796 5.48c.566.647.106 1.659-.753 1.659H3.204a1 1 0 0 1-.753-1.659z"/>
+                            </svg>
+                            {% else %}
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="gray" class="upcolor{{ post.id }} bi bi-caret-up" viewBox="0 0 16 16">
+                                <path d="M3.204 11h9.592L8 5.519 3.204 11zm-.753-.659 4.796-5.48a1 1 0 0 1 1.506 0l4.796 5.48c.566.647.106 1.659-.753 1.659H3.204a1 1 0 0 1-.753-1.659z"/>
+                            </svg>
+                            {% endif %}
+                        </a>
+                        
+                        <span class="avg-vote text-muted vote_count{{ post.id }}"> {{ post.number_of_votes }} Vote{{ post.number_of_votes|pluralize }} </span>                         
+                        <a class ="vote ", data-id="{{ post.pk }}" type="submit", data-content_type="{{ post.content_type }}", data-url='{{ post.get_vote_url }}', data-vote="post_downvoted">
+                            {% if post.is_downvoted %}
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="blue" class=" downcolor{{ post.id }} bi bi-caret-down" viewBox="0 0 16 16">
+                                <path d="M3.204 5h9.592L8 10.481 3.204 5zm-.753.659 4.796 5.48a1 1 0 0 0 1.506 0l4.796-5.48c.566-.647.106-1.659-.753-1.659H3.204a1 1 0 0 0-.753 1.659z"/>
+                            </svg>
+                            {% else %}
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="gray" class=" downcolor{{ post.id }} bi bi-caret-down" viewBox="0 0 16 16">
+                                <path d="M3.204 5h9.592L8 10.481 3.204 5zm-.753.659 4.796 5.48a1 1 0 0 0 1.506 0l4.796-5.48c.566-.647.106-1.659-.753-1.659H3.204a1 1 0 0 0-.753 1.659z"/>
+                            </svg>
+                            {% endif %}
+                        </a>
+                        <small class="down{{ post.id }}">{{ post.num_downvotes }}</small> 
                 </span>
 
         </div>
@@ -35,9 +45,15 @@
 
              
             <a class ="vote star", data-id="{{ post.pk }}" type="submit", data-content_type="{{ post.content_type }}", data-url='{{ post.get_vote_url }}', data-vote="post_favorited">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class=" favcolor{{ post.id }} bi bi-star" viewBox="0 0 16 16">
+                {% if post.is_favorited %}
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="gold" class=" favcolor{{ post.id }} bi bi-star" viewBox="0 0 16 16">
                     <path d="M2.866 14.85c-.078.444.36.791.746.593l4.39-2.256 4.389 2.256c.386.198.824-.149.746-.592l-.83-4.73 3.522-3.356c.33-.314.16-.888-.282-.95l-4.898-.696L8.465.792a.513.513 0 0 0-.927 0L5.354 5.12l-4.898.696c-.441.062-.612.636-.283.95l3.523 3.356-.83 4.73zm4.905-2.767-3.686 1.894.694-3.957a.565.565 0 0 0-.163-.505L1.71 6.745l4.052-.576a.525.525 0 0 0 .393-.288L8 2.223l1.847 3.658a.525.525 0 0 0 .393.288l4.052.575-2.906 2.77a.565.565 0 0 0-.163.506l.694 3.957-3.686-1.894a.503.503 0 0 0-.461 0z"/>
                 </svg>
+                {% else %}
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="black" class=" favcolor{{ post.id }} bi bi-star" viewBox="0 0 16 16">
+                    <path d="M2.866 14.85c-.078.444.36.791.746.593l4.39-2.256 4.389 2.256c.386.198.824-.149.746-.592l-.83-4.73 3.522-3.356c.33-.314.16-.888-.282-.95l-4.898-.696L8.465.792a.513.513 0 0 0-.927 0L5.354 5.12l-4.898.696c-.441.062-.612.636-.283.95l3.523 3.356-.83 4.73zm4.905-2.767-3.686 1.894.694-3.957a.565.565 0 0 0-.163-.505L1.71 6.745l4.052-.576a.525.525 0 0 0 .393-.288L8 2.223l1.847 3.658a.525.525 0 0 0 .393.288l4.052.575-2.906 2.77a.565.565 0 0 0-.163.506l.694 3.957-3.686-1.894a.503.503 0 0 0-.461 0z"/>
+                </svg>
+                {% endif%}
             </a>
             <small class="favorite{{ post.id }}">{{ post.num_favorites }}</small>   
             <h2><a class="article-title" href="{% url 'post-detail' post.id %}">{{ post.title }}</a></h2>

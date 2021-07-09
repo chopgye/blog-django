@@ -1,5 +1,6 @@
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import query
+from django.db.models.query_utils import Q
 from django.http import request, response
 from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404
@@ -21,6 +22,7 @@ from .forms import NewCommentForm, VoteForm
 from django.http import HttpResponse
 import json
 from django.core import serializers
+from django.template.loader import render_to_string
 
 
 # provides inbound HTTP request to django server
@@ -34,43 +36,8 @@ class PostListView(ListView):
     model = Post
     template_name = 'blog/home.html'  #<app>/<model>_<viewtype>.html
     context_object_name = 'posts'   #otherwise object.list is iterated in the template
-    ordering = ['-date_posted'] #newest to oldest in the object query
-    # paginate_by = 5
-
-# (Without ajax call, pure django) 
-#    def get_context_data(self, **kwargs):   #override this method, to pass more context than the original implemenation
-#        context = super().get_context_data(**kwargs)   #call base implementaion to get the base 
+    ordering = ['-date_posted'] #newest to oldest in the object 
         
-#        if self.request.user.is_authenticated:
-#            context['vote_form'] = VoteForm(instance = self.request.user)
-#        return context
-
-
-
- #   def post(self, request, *args, **kwargs):
-        
-#      post = get_object_or_404(Post, id=request.POST.get('post_id'))
-
-
- #       post1 = get_object_or_404(Post, id=request.POST.get('post_upvoted'))
- #       post2 = get_object_or_404(Post, id=request.POST.get('post_downvoted'))
-        
-#        new_vote = Vote(vote_choice=request.POST.get('vote_choice'),
-#                                  author=self.request.user,
-#                                  content_object=post)
-#        new_vote.save()
-
- #       if response.POST.get("post_upvoted"):
- #           new_vote = Vote(vote_choice='U',
- #                                 author=self.request.user,
- #                                 content_object=post1)
- #           new_vote.save()
-
- #       elif response.POST.get("post_downvoted"):
- #           pass
-
-#      return self.get(self, request, *args, **kwargs)
-
 class PostLikeToggle(RedirectView):
     model = Post
     template_name = 'blog/home.html'  #<app>/<model>_<viewtype>.html

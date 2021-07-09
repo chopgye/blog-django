@@ -89,6 +89,33 @@ class Post(VoteModel):
     def number_of_comments(self):
         return Comment.objects.filter(parent_post=self).count()
     
+    @property
+    def is_upvoted(self):
+        if Vote.objects.filter(object_id = self.id, type_of_vote = 'U'):
+            isUpvoted = True
+        else:
+            isUpvoted = False 
+
+        return isUpvoted
+
+    @property
+    def is_downvoted(self):
+        if Vote.objects.filter(object_id = self.id, type_of_vote = 'D'):
+            isDownvoted = True
+        else:
+            isDownvoted = False 
+
+        return isDownvoted
+
+    @property
+    def is_favorited(self):
+        if Vote.objects.filter(object_id = self.id, type_of_vote = 'F'):
+            isFavorited = True
+        else:
+            isFavorited = False 
+
+        return isFavorited
+    
 class Comment(VoteModel):
     parent_post = models.ForeignKey(Post, related_name="comments", on_delete=models.CASCADE)
     author = models.ForeignKey(User, on_delete=CASCADE)

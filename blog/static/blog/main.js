@@ -45,7 +45,7 @@ $(document).ready(function () {
         
 
                     if (data['is_upvoted'] == true) { 
-                        $(".upcolor" + id).css('fill', 'orangered');
+                        $(".upcolor" + id).css('fill', 'orange');
                     } else {
                         $(".upcolor" + id).css('fill', 'gray');
                     }
@@ -59,7 +59,7 @@ $(document).ready(function () {
                     if (data['is_favorited'] == true) { 
                         $(".favcolor"+ id).css('fill', 'gold');
                     } else {
-                        $(".favcolor"+ id).css('fill', 'black');
+                        $(".favcolor"+ id).css('fill', 'gray');
                     }
                     
         

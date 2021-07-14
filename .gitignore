@@ -20,7 +20,7 @@ db.sqlite3-journal
 media
 
 ### environmental varibles ### 
-.env
+#.env
 
 ### dummy data
 posts.json

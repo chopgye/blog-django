@@ -1,5 +1,5 @@
-# [Django Blog](https://fatidique-moliere-25464.herokuapp.com/)
-
+# Django Blog
+[Demo](https://fatidique-moliere-25464.herokuapp.com/)
 ## General Info
  I wanted to do a project that's simple in concept, therefore I have more freedom to focus all my efforts and complexity on the implementation side. This blog app utilizies MVC framework and handles all the renderings on the server side (SSR). This project is almost purely ran on vanilla Django, with some javascript exceptions such as AJAX calls. 
 
